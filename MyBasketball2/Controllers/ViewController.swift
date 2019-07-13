@@ -10,9 +10,10 @@ import UIKit
 import SceneKit
 import ARKit
 
-class ViewController: UIViewController{
+class ViewController: UIViewController,SCNPhysicsContactDelegate{
 
     
+    @IBOutlet weak var labelCount: UILabel!
     
     @IBOutlet var sceneView: ARSCNView!
     
@@ -26,6 +27,7 @@ class ViewController: UIViewController{
         }
     }
     
+    var scoreResult = 0
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -88,13 +90,16 @@ class ViewController: UIViewController{
         let power = Float(10)
         let force = SCNVector3(-transform.m31 * power, -transform.m32 * power, -transform.m33 * power)
         ball.physicsBody?.applyForce(force, asImpulse: true)
+      
+                ball.physicsBody!.categoryBitMask = CollisionCategory.missileCategory.rawValue
+                ball.physicsBody!.collisionBitMask = CollisionCategory.targetCategory.rawValue
+        
         sceneView.scene.rootNode.addChildNode(ball)
-        ball.physicsBody? .categoryBitMask = CollisionCategory.missileCategory.rawValue
-        ball.physicsBody? .collisionBitMask = CollisionCategory.targetCategory.rawValue
+
     }
     
     func createBoard(result: ARHitTestResult) {
-        let textBoard = SCNText(string: <#T##Any?#>, extrusionDepth: <#T##CGFloat#>)
+     //   let textBoard = SCNText(string: <#T##Any?#>, extrusionDepth: <#T##CGFloat#>)
       
         let box = SCNBox(width: 1.8, height: 1.1, length: 0.1, chamferRadius: 0)
         let material = SCNMaterial()
@@ -115,6 +120,12 @@ class ViewController: UIViewController{
     
         board.eulerAngles.x -= .pi/2
         board.physicsBody = SCNPhysicsBody(type: .static, shape: SCNPhysicsShape(node: board))
+        
+        
+        
+        mainTorusNode.physicsBody!.categoryBitMask = CollisionCategory.missileCategory.rawValue
+        mainTorusNode.physicsBody!.collisionBitMask = CollisionCategory.targetCategory.rawValue
+        
         sceneView.scene.rootNode.addChildNode(board)
         sceneView.scene.rootNode.enumerateChildNodes { node, _ in
             if node.name == "Wall"{
@@ -122,8 +133,7 @@ class ViewController: UIViewController{
             }
         }
         
-        mainTorusNode.physicsBody? .categoryBitMask = CollisionCategory.missileCategory.rawValue
-        mainTorusNode.physicsBody? .collisionBitMask = CollisionCategory.targetCategory.rawValue
+
         
     }
     
@@ -140,6 +150,28 @@ class ViewController: UIViewController{
         
         return wall
     }
+    
+    
+    
+    func physicsWorld(_ world: SCNPhysicsWorld, didBegin contact: SCNPhysicsContact) {
+        print ( " ** Collision !! "  + contact.nodeA.name!  +  " hit "  + contact.nodeB.name! )
+        
+        if contact.nodeA.physicsBody?.categoryBitMask == CollisionCategory.targetCategory.rawValue
+            || contact.nodeB.physicsBody?.categoryBitMask == CollisionCategory.targetCategory.rawValue {
+            
+            if (contact.nodeA.name! == "shark" || contact.nodeB.name! == "shark") {
+                scoreResult+=5
+            }else{
+                scoreResult+=1
+            }
+            DispatchQueue.main.async {
+                contact.nodeA.removeFromParentNode()
+                contact.nodeB.removeFromParentNode()
+                self.labelCount.text = String(self.scoreResult)
+            }
+        }
+    }
+    
     
     
 }
@@ -159,14 +191,13 @@ class ViewController: UIViewController{
 
 
 
-extension ViewController: SCNPhysicsContactDelegate{
-    
-    func physicsWorld(_ world: SCNPhysicsWorld, didBegin contact: SCNPhysicsContact) {
-        print ( " ** Collision !! "  + contact. nodeA . name !  +  " hit "  + contact. nodeB . name ! )
 
-    }
-    
-}
+
+
+
+
+
+
 struct CollisionCategory: OptionSet {
     let rawValue: Int
     static let missileCategory = CollisionCategory (rawValue: 1 << 0)
