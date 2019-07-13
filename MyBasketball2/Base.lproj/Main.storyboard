@@ -20,6 +20,10 @@
                         <subviews>
                             <arscnView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="BrB-h1-WRS">
                                 <rect key="frame" x="0.0" y="0.0" width="414" height="862"/>
+                                <gestureRecognizers/>
+                                <connections>
+                                    <outletCollection property="gestureRecognizers" destination="uuj-Q2-fix" appends="YES" id="3mD-iu-sHw"/>
+                                </connections>
                             </arscnView>
                             <visualEffectView opaque="NO" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="3PF-Go-GTa">
                                 <rect key="frame" x="20" y="64" width="374" height="39"/>
@@ -61,6 +65,11 @@
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="SZV-WD-TEh" sceneMemberID="firstResponder"/>
+                <tapGestureRecognizer id="uuj-Q2-fix">
+                    <connections>
+                        <action selector="screenTaped:" destination="BV1-FR-VrT" id="PRE-kU-OaB"/>
+                    </connections>
+                </tapGestureRecognizer>
             </objects>
             <point key="canvasLocation" x="137.68115942028987" y="136.60714285714286"/>
         </scene>
