@@ -30,7 +30,8 @@ class ViewController: UIViewController{
     override func viewDidLoad() {
         super.viewDidLoad()
         
-       
+       sceneView.scene.physicsWorld.contactDelegate = self
+        
         sceneView.delegate = self
         
         sceneView.showsStatistics = true
@@ -81,13 +82,19 @@ class ViewController: UIViewController{
         material.diffuse.contents = ballMaterial
         sphere.materials = [material]
         let ball = SCNNode(geometry: sphere)
-        let transform = frame.camera.transform
+        ball.physicsBody = SCNPhysicsBody(type: .dynamic, shape: SCNPhysicsShape(node: ball, options: [SCNPhysicsShape.Option.collisionMargin: 0.01]))
+        let transform = SCNMatrix4(frame.camera.transform)
+        ball.transform = transform
+        let power = Float(10)
+        let force = SCNVector3(-transform.m31 * power, -transform.m32 * power, -transform.m33 * power)
+        ball.physicsBody?.applyForce(force, asImpulse: true)
         sceneView.scene.rootNode.addChildNode(ball)
-        
+        ball.physicsBody? .categoryBitMask = CollisionCategory.missileCategory.rawValue
+        ball.physicsBody? .collisionBitMask = CollisionCategory.targetCategory.rawValue
     }
     
     func createBoard(result: ARHitTestResult) {
-        
+        let textBoard = SCNText(string: <#T##Any?#>, extrusionDepth: <#T##CGFloat#>)
       
         let box = SCNBox(width: 1.8, height: 1.1, length: 0.1, chamferRadius: 0)
         let material = SCNMaterial()
@@ -102,17 +109,22 @@ class ViewController: UIViewController{
         let mainTorusNode = SCNNode(geometry: mainTorus)
         mainTorusNode.position.y = -0.25
         mainTorusNode.position.z = 0.45
+        mainTorusNode.physicsBody = SCNPhysicsBody(type: .static, shape: SCNPhysicsShape(node: mainTorusNode, options: [SCNPhysicsShape.Option.type: SCNPhysicsShape.ShapeType.concavePolyhedron]))
         board.addChildNode(mainTorusNode)
         board.simdTransform = result.worldTransform
     
-        board.eulerAngles.x = -.pi
-     
+        board.eulerAngles.x -= .pi/2
+        board.physicsBody = SCNPhysicsBody(type: .static, shape: SCNPhysicsShape(node: board))
         sceneView.scene.rootNode.addChildNode(board)
         sceneView.scene.rootNode.enumerateChildNodes { node, _ in
             if node.name == "Wall"{
                 node.removeFromParentNode()
             }
         }
+        
+        mainTorusNode.physicsBody? .categoryBitMask = CollisionCategory.missileCategory.rawValue
+        mainTorusNode.physicsBody? .collisionBitMask = CollisionCategory.targetCategory.rawValue
+        
     }
     
     func createWall(planeAnchor: ARPlaneAnchor) -> SCNNode{
@@ -141,4 +153,22 @@ class ViewController: UIViewController{
             }
         
 
+}
+
+
+
+
+
+extension ViewController: SCNPhysicsContactDelegate{
+    
+    func physicsWorld(_ world: SCNPhysicsWorld, didBegin contact: SCNPhysicsContact) {
+        print ( " ** Collision !! "  + contact. nodeA . name !  +  " hit "  + contact. nodeB . name ! )
+
+    }
+    
+}
+struct CollisionCategory: OptionSet {
+    let rawValue: Int
+    static let missileCategory = CollisionCategory (rawValue: 1 << 0)
+    static let targetCategory = CollisionCategory (rawValue: 1 << 1)
 }
