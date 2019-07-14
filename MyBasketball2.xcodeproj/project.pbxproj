@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		1C3462E722DAD00200AED154 /* Bomb.scn in Resources */ = {isa = PBXBuildFile; fileRef = 1C3462E622DAD00200AED154 /* Bomb.scn */; };
 		1C9F302022DA0F2E005E06D4 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1C9F301F22DA0F2E005E06D4 /* AppDelegate.swift */; };
 		1C9F302222DA0F2E005E06D4 /* art.scnassets in Resources */ = {isa = PBXBuildFile; fileRef = 1C9F302122DA0F2E005E06D4 /* art.scnassets */; };
 		1C9F302422DA0F2E005E06D4 /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1C9F302322DA0F2E005E06D4 /* ViewController.swift */; };
@@ -17,6 +18,7 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		1C3462E622DAD00200AED154 /* Bomb.scn */ = {isa = PBXFileReference; lastKnownFileType = file.bplist; path = Bomb.scn; sourceTree = "<group>"; };
 		1C9F301C22DA0F2E005E06D4 /* MyBasketball2.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = MyBasketball2.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		1C9F301F22DA0F2E005E06D4 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		1C9F302122DA0F2E005E06D4 /* art.scnassets */ = {isa = PBXFileReference; lastKnownFileType = wrapper.scnassets; path = art.scnassets; sourceTree = "<group>"; };
@@ -44,6 +46,7 @@
 			children = (
 				1C9F301E22DA0F2E005E06D4 /* MyBasketball2 */,
 				1C9F301D22DA0F2E005E06D4 /* Products */,
+				1C3462E622DAD00200AED154 /* Bomb.scn */,
 			);
 			sourceTree = "<group>";
 		};
@@ -144,6 +147,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				1C3462E722DAD00200AED154 /* Bomb.scn in Resources */,
 				1C9F302222DA0F2E005E06D4 /* art.scnassets in Resources */,
 				1C9F302C22DA0F2F005E06D4 /* LaunchScreen.storyboard in Resources */,
 				1C9F302922DA0F2F005E06D4 /* Assets.xcassets in Resources */,
