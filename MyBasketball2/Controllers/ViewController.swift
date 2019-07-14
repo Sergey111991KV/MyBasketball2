@@ -29,6 +29,8 @@ class ViewController: UIViewController,SCNPhysicsContactDelegate{
     
     var scoreResult = 0
     
+    var firstRing = 0
+    var secondRing = 0
     override func viewDidLoad() {
         super.viewDidLoad()
         
@@ -93,9 +95,9 @@ class ViewController: UIViewController,SCNPhysicsContactDelegate{
         ball.name = "Ball"
         ball.physicsBody?.categoryBitMask = CollisionCategory.missileCategory.rawValue
         ball.physicsBody?.collisionBitMask = CollisionCategory.targetCategory.rawValue
-        ball.physicsBody?.contactTestBitMask = CollisionCategory.secondTargetCategory.rawValue
+       
         
-        print( ball.physicsBody?.collisionBitMask)
+      
         sceneView.scene.rootNode.addChildNode(ball)
 
     }
@@ -111,17 +113,17 @@ class ViewController: UIViewController,SCNPhysicsContactDelegate{
         let board = SCNNode(geometry: box)
         
         let mainTorus = SCNTorus(ringRadius: 0.45, pipeRadius: 0.01)
-        let secondTorus = SCNTorus(ringRadius: 0.45, pipeRadius: 0.01)
+        let secondTorus = SCNTorus(ringRadius: 0.30, pipeRadius: 0.01)
         secondTorus.firstMaterial?.diffuse.contents = UIColor.black
         mainTorus.firstMaterial?.diffuse.contents = UIColor.red
         let mainTorusNode = SCNNode(geometry: mainTorus)
         let secondTorusNode = SCNNode(geometry: secondTorus)
-        secondTorusNode.position.y = -0.30
+        secondTorusNode.position.y = -0.50
         secondTorusNode.position.z = 0.45
         mainTorusNode.position.y = -0.25
         mainTorusNode.position.z = 0.45
         mainTorusNode.physicsBody = SCNPhysicsBody(type: .static, shape: SCNPhysicsShape(node: mainTorusNode, options: [SCNPhysicsShape.Option.type: SCNPhysicsShape.ShapeType.concavePolyhedron]))
-         mainTorusNode.physicsBody = SCNPhysicsBody(type: .static, shape: SCNPhysicsShape(node: mainTorusNode, options: [SCNPhysicsShape.Option.type: SCNPhysicsShape.ShapeType.concavePolyhedron]))
+         secondTorusNode.physicsBody = SCNPhysicsBody(type: .static, shape: SCNPhysicsShape(node: secondTorusNode, options: [SCNPhysicsShape.Option.type: SCNPhysicsShape.ShapeType.concavePolyhedron]))
          board.addChildNode(secondTorusNode)
         board.addChildNode(mainTorusNode)
         board.simdTransform = result.worldTransform
@@ -132,7 +134,7 @@ class ViewController: UIViewController,SCNPhysicsContactDelegate{
         mainTorusNode.name = "Ring"
         mainTorusNode.physicsBody?.categoryBitMask = CollisionCategory.targetCategory.rawValue
         mainTorusNode.physicsBody?.contactTestBitMask = CollisionCategory.missileCategory.rawValue
-        secondTorusNode.physicsBody?.categoryBitMask = CollisionCategory.secondTargetCategory.rawValue
+        secondTorusNode.physicsBody?.categoryBitMask = CollisionCategory.otherCategory.rawValue
         secondTorusNode.physicsBody?.contactTestBitMask = CollisionCategory.missileCategory.rawValue
         sceneView.scene.rootNode.addChildNode(board)
         sceneView.scene.rootNode.enumerateChildNodes { node, _ in
@@ -163,25 +165,41 @@ class ViewController: UIViewController,SCNPhysicsContactDelegate{
     
     func physicsWorld(_ world: SCNPhysicsWorld, didBegin contact: SCNPhysicsContact) {
         print ( " ** Collision !! "  + contact.nodeA.name!  +  " hit "  + contact.nodeB.name! )
-        
-        if contact.nodeA.physicsBody?.categoryBitMask == CollisionCategory.missileCategory.rawValue
-            || contact.nodeB.physicsBody?.categoryBitMask == CollisionCategory.secondTargetCategory.rawValue {
+        print(firstRing,secondRing)
+        if contact.nodeA.physicsBody?.categoryBitMask == CollisionCategory.targetCategory.rawValue
+            || contact.nodeB.physicsBody?.categoryBitMask == CollisionCategory.targetCategory.rawValue {
             
-          
-               return
-        } else{ if contact.nodeA.physicsBody?.categoryBitMask == CollisionCategory.missileCategory.rawValue
+            if (contact.nodeA.name! == "Ball" || contact.nodeB.name! == "Ring") {
+                if secondRing == 1{ return}else{
+                 firstRing = 1
             }
-            DispatchQueue.main.async {
-               
-             
-                self.labelCount.text = String(self.scoreResult)
             }
+        }; if contact.nodeA.physicsBody?.categoryBitMask == CollisionCategory.targetCategory.rawValue
+            || contact.nodeB.physicsBody?.categoryBitMask == CollisionCategory.otherCategory.rawValue{
+                if (contact.nodeA.name! == "Ball" || contact.nodeB.name! == "RingSecond") {
+                    
+                    
+                    if firstRing == 1{
+                         scoreResult += 1
+                        firstRing = 0
+                    DispatchQueue.main.async {
+                        
+                        contact.nodeA.physicsBody?.categoryBitMask = CollisionCategory.defaultCategory.rawValue;               self.labelCount.text = String(self.scoreResult)
+                            print(self.scoreResult)
+                    }
+                    
+                    }
+                    
+            }
+            }
+       
         }
     
-    
-    
-    
+
 }
+    
+    
+
 
      //MARK: - ARSCNViewDelegate
     extension ViewController: ARSCNViewDelegate    {
@@ -209,6 +227,8 @@ struct CollisionCategory: OptionSet {
     let rawValue: Int
     static let missileCategory = CollisionCategory (rawValue: 1 << 0)
     static let targetCategory = CollisionCategory (rawValue: 1 << 1)
-    static let secondTargetCategory = CollisionCategory ( rawValue: 1 << 2)
+    static let otherCategory = CollisionCategory (rawValue: 1 << 2)
+    static let defaultCategory = CollisionCategory (rawValue: 1 << 3)
     
 }
+
